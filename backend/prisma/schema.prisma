@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  GOOGLE
+}
+
+enum DocumentRole {
+  OWNER
+  EDITOR
+  COMMENTER
+  VIEWER
+}
+
+model User {
+  id             String           @id @default(uuid())
+  email          String           @unique
+  name           String?
+  avatarUrl      String?
+  accentColor    String           @default("#54a0ff")
+  authProvider   AuthProvider
+  authProviderId String           @unique
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  ownedDocuments Document[]       @relation("DocumentOwner")
+  memberships    DocumentMember[]
+}
+
+model Document {
+  id           String           @id @default(uuid())
+  title        String           @db.VarChar(256)
+  description  String           @default("")
+  roomId       String           @unique
+  status       String           @default("active")
+  snapshot     String?          @db.Text
+  lastEditedBy String?
+  ownerId      String?
+  owner        User?            @relation("DocumentOwner", fields: [ownerId], references: [id])
+  members      DocumentMember[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+}
+
+model DocumentMember {
+  id         String       @id @default(uuid())
+  documentId String
+  userId     String
+  role       DocumentRole
+  createdAt  DateTime     @default(now())
+
+  document Document @relation(fields: [documentId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@unique([documentId, userId])
+}

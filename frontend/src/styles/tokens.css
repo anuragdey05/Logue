@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  color-scheme: dark;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'Courier Prime', 'SFMono-Regular', Menlo, monospace;
+  --background: #05070e;
+  --foreground: #e6e8eb;
+  --surface: #0f141f;
+  --surface-elevated: #161b28;
+  --surface-muted: #1e2433;
+  --border: rgba(255, 255, 255, 0.08);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --primary: #0b6faf;
+  --primary-foreground: #ffffff;
+  --accent: #ff6f3c;
+  --accent-soft: rgba(255, 111, 60, 0.12);
+  --muted: #8a8f98;
+  --success: #10b981;
+  --shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+  --radius-sm: 0.35rem;
+  --radius-md: 0.65rem;
+  --radius-lg: 1rem;
+  --grid-gap: 1rem;
+  --sidebar-width: 320px;
+}

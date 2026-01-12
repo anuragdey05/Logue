@@ -1,0 +1,80 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: logue-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: logue
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - logue-net
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: DockerFile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/logue?schema=public
+      APP_BASE_URL: http://localhost:5173
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: http://localhost:4000/auth/google/callback
+      SESSION_SECRET: ${SESSION_SECRET}
+      SESSION_TTL_SECONDS: "2592000"
+    ports:
+      - "4000:4000"
+    networks:
+      - logue-net
+
+  collab-server:
+    build:
+      context: ../collaborative-server
+      dockerfile: DockerFile
+    depends_on:
+      - backend
+    environment:
+      BACKEND_URL: http://backend:4000
+      PORT: 1234
+    ports:
+      - "1234:1234"
+    networks:
+      - logue-net
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: DockerFile
+      args:
+        # These must be reachable from the browser, so use localhost + exposed ports
+        VITE_BACKEND_URL: http://localhost:4000
+        VITE_COLLAB_SERVER_URL: ws://localhost:1234
+    depends_on:
+      - backend
+      - collab-server
+    ports:
+      - "5173:80"
+    networks:
+      - logue-net
+
+volumes:
+  postgres-data:
+
+networks:
+  logue-net:
+    driver: bridge

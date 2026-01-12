@@ -1,0 +1,100 @@
+@baseUrl = http://localhost:4000
+@authCookie = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkODU5NjcyMy1iOWMyLTQxNTEtOTRjYi02MzBiZjczMzlhN2IiLCJpYXQiOjE3NjUzOTgzOTksImV4cCI6MTc2Nzk5MDM5OX0.h56jDcgehrU7ZkxBiHe7XYjUBBGHVGU9hL7vIO4gOSY
+@serviceApiKey = YOUR_SERVICE_API_KEY_HERE
+
+### Health check
+GET {{baseUrl}}/health
+
+### Get current user (requires auth cookie)
+GET {{baseUrl}}/auth/user
+Cookie: logue_session={{authCookie}}
+
+### Logout
+POST {{baseUrl}}/auth/logout
+Cookie: logue_session={{authCookie}}
+
+### Create document (OWNER)
+POST {{baseUrl}}/documents
+Content-Type: application/json
+Cookie: logue_session={{authCookie}}
+
+{
+  "title": "Test Script from .http",
+  "description": "Created via REST client"
+}
+
+### List my documents
+GET {{baseUrl}}/documents
+Cookie: logue_session={{authCookie}}
+
+### Get a specific document by id
+GET {{baseUrl}}/documents/d93dfa1d-8062-4f0d-b818-1259c4691498
+Cookie: logue_session={{authCookie}}
+
+### Update document metadata (title/description/status)
+PATCH {{baseUrl}}/documents/d93dfa1d-8062-4f0d-b818-1259c4691498
+Content-Type: application/json
+Cookie: logue_session={{authCookie}}
+
+{
+  "title": "Updated Title",
+  "description": "Updated description",
+  "status": "active"
+}
+
+### Delete a document (OWNER only)
+DELETE {{baseUrl}}/documents/d93dfa1d-8062-4f0d-b818-1259c4691498
+Cookie: logue_session={{authCookie}}
+
+### Get snapshot as user (requires access)
+GET {{baseUrl}}/documents/d93dfa1d-8062-4f0d-b818-1259c4691498/snapshot
+Cookie: logue_session={{authCookie}}
+
+### Put snapshot as user (requires access)
+PUT {{baseUrl}}/documents/d93dfa1d-8062-4f0d-b818-1259c4691498/snapshot
+Content-Type: application/json
+Cookie: logue_session={{authCookie}}
+
+{
+  "snapshot": "BASE64_YJS_STATE_HERE"
+}
+
+### Get snapshot as service (bypasses user auth, uses SERVICE_API_KEY)
+GET {{baseUrl}}/documents/d93dfa1d-8062-4f0d-b818-1259c4691498/snapshot
+X-Service-Api-Key: {{serviceApiKey}}
+
+### Put snapshot as service
+PUT {{baseUrl}}/documents/d93dfa1d-8062-4f0d-b818-1259c4691498/snapshot
+Content-Type: application/json
+X-Service-Api-Key: {{serviceApiKey}}
+
+{
+  "snapshot": "BASE64_YJS_STATE_HERE"
+}
+
+### List members for a document (requires access)
+GET {{baseUrl}}/documents/d93dfa1d-8062-4f0d-b818-1259c4691498/members
+Cookie: logue_session={{authCookie}}
+
+### Invite/add a member (OWNER only)
+POST {{baseUrl}}/documents/d93dfa1d-8062-4f0d-b818-1259c4691498/members
+Content-Type: application/json
+Cookie: logue_session={{authCookie}}
+
+{
+  "email": "invitee@example.com",
+  "role": "EDITOR"
+}
+
+### Update a member's role (OWNER only; cannot demote self)
+PATCH {{baseUrl}}/documents/d93dfa1d-8062-4f0d-b818-1259c4691498/members/c361669a-d887-4f41-9d6b-eec2d9035c00
+Content-Type: application/json
+Cookie: logue_session={{authCookie}}
+
+{
+  "role": "VIEWER"
+}
+
+### Remove a member (OWNER only; cannot remove self)
+DELETE {{baseUrl}}/documents/d93dfa1d-8062-4f0d-b818-1259c4691498/members/c361669a-d887-4f41-9d6b-eec2d9035c00
+Cookie: logue_session={{authCookie}}
